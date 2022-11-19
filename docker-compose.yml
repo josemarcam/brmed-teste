@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: 'cotacao_dev'
+      MYSQL_USER: 'dev'
+      MYSQL_PASSWORD: 'dev'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - "33306:3306"
+    volumes:
+      - ./data/mysql/data:/var/lib/mysql/
+    networks:
+      - docker-network
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '5379:6379'
+    volumes: 
+      - ./data/redis:/data
+networks: 
+  docker-network:
+    driver: bridge

@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <!-- highcharts -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
+    <!-- ToastrJs -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" >
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="row d-flex justify-content-center mt-2">
+        <div class="col-4">
+          <input class="form-control" type="date" id="from_data_picker"/>
+        </div>
+        <div class="col-4">
+          <input class="form-control" type="date" id="to_data_picker" />
+        </div>
+        <div class="col-2 d-grid ">
+          <button class="btn btn-info btn-block text-white" id="search_btn">buscar</button>
+        </div>
+      </div>
+
+      <hr>
+      
+      <div class="row">
+        <div id="chats" style="width:100%; height:400px;"></div>
+      </div>
+    
+    </div>
+    <script>
+      
+      let dict_data = JSON.parse("{{api_data|escapejs}}");
+      series = []
+
+      dict_data.forEach(element => {
+        let str_date = Object.keys(element)[0]
+        current_series_data = [element[str_date].BRL, element[str_date].EUR, element[str_date].JPY]
+        current_series = {
+          name: str_date,
+          data: current_series_data,
+          tooltip: {
+            valueDecimals: 3
+          }
+        }
+
+        series.push(current_series)
+      });
+
+      document.addEventListener('DOMContentLoaded', function () {
+          const chart = Highcharts.chart('chats', {
+              chart: {
+                  type: 'column'
+              },
+              title: {
+                  text: 'Cotacao baseada no USD'
+              },
+              xAxis: {
+                  categories: ["BRL","EUR","JPY"]
+              },
+              series: series
+          });
+      });
+    </script>
+
+    <script>
+      // toastr
+      $( document ).ready(function() {
+          error = JSON.parse("{{errors|escapejs}}")
+          let error_messages = ""
+          console.log(error.lenght)
+          if (error.length != 0){
+            error.forEach(element => {
+              error_messages += `\n${element['msg']}`
+            });
+            toastr.error(error_messages)
+          }
+      })
+
+    </script>
+
+    {% load static %}
+    <script src="{% static 'js/search.js' %}" ></script>
+  
+  
+  </body>
+</html>
